@@ -227,6 +227,18 @@ img-lab/
 - JDK 17+
 - Maven 3.x
 
+#### 图像路径格式
+
+支持绝对路径和相对路径：
+
+| 系统 | 路径示例 |
+|------|---------|
+| Linux | `/home/user/images/photo.png` 或 `./images/photo.png` |
+| macOS | `/Users/user/images/photo.png` 或 `./images/photo.png` |
+| Windows | `C:\Users\user\images\photo.png` 或 `.\images\photo.png` |
+
+Java 会自动处理路径分隔符，上述格式均可用。Windows 用户也可使用正斜杠（`/`）作为路径分隔符。
+
 #### 编译项目
 ```bash
 mvn compile
