@@ -196,6 +196,8 @@ processors.values().stream()
 ```
 img-lab/
 ├── pom.xml                                    # Maven配置
+├── README.md                                  # 使用说明文档
+├── REPORT.md                                  # 实验报告
 ├── images/                                    # 输入图像目录
 ├── image_output/                              # 输出图像目录
 ├── src/main/java/com/imglab/
@@ -332,6 +334,39 @@ mvn exec:java -Dexec.mainClass="com.imglab.ImageLabCLI" \
      -Dexec.args="--batch ./images/ ./output/ grayscale scale,2.0 edge"
 ```
 
+**注意：** 批处理目前对每个操作是独立处理的，即 `--batch in/ out/ op1 op2` 会先处理所有文件的 op1，再处理所有文件的 op2，而不是链式处理单个文件。
+
+#### CLI 操作列表与参数说明
+
+| 操作 | CLI 命令 | 参数说明 | 示例 |
+|------|----------|----------|------|
+| 灰度转换 | `grayscale` / `gray` | 无 | `grayscale` |
+| 亮度调整 | `brightness` | 整数（正数变亮，负数变暗） | `brightness 50` / `brightness -30` |
+| 对比度调整 | `contrast` | 小数（>1 增加，<1 减少） | `contrast 1.5` / `contrast 0.8` |
+| 模糊 | `blur` | 无 | `blur` |
+| 锐化 | `sharpen` | 无 | `sharpen` |
+| 边缘检测 | `edge` | 无（Sobel算子） | `edge` |
+| 颜色反转 | `invert` | 无 | `invert` |
+| 水平翻转 | `flip-h` | 无 | `flip-h` |
+| 垂直翻转 | `flip-v` | 无 | `flip-v` |
+| 旋转 | `rotate` | 度数（90的倍数） | `rotate 90` / `rotate 180` / `rotate 270` |
+| 缩放 | `scale` | 比例（>1 放大，<1 缩小） | `scale 2.0` / `scale 0.5` |
+| 阈值二值化 | `threshold` | 0-255 的整数 | `threshold 128` |
+| 腐蚀 | `erode` | 无 | `erode` |
+| 膨胀 | `dilate` | 无 | `dilate` |
+
+**参数默认值：**
+
+带参数的操作如果省略参数会使用默认值：
+
+| 操作 | 默认参数值 |
+|------|-----------|
+| `brightness` | 30 |
+| `contrast` | 1.5 |
+| `rotate` | 90 |
+| `scale` | 1.5 |
+| `threshold` | 128 |
+
 #### 直接运行JAR
 
 打包后可脱离 Maven 直接运行，使用方法与 `mvn exec:java` 相同，只需替换命令：
@@ -367,6 +402,17 @@ $ mvn package
 $ ls target/*.jar
 target/img-lab-1.0-SNAPSHOT.jar
 ```
+
+#### 常见问题
+
+**Q: 提示 "文件不存在"**
+A: 检查图像路径是否正确，确保文件存在且格式受支持（PNG、JPG、BMP）
+
+**Q: 编译报错 "release 版本不匹配"**
+A: 确保 JDK 版本 >= 17，查看 `pom.xml` 中的 `<release>17</release>`
+
+**Q: 批处理模式找不到文件**
+A: 确保输入目录存在且包含 .png/.jpg/.jpeg/.bmp 文件
 
 ### 3.3 核心代码分析
 
