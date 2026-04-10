@@ -232,6 +232,34 @@ img-lab/
 - Maven 3.x
 - JUnit 5.10.0（用于单元测试）
 
+#### 3.3 项目依赖
+
+**Maven依赖：**
+
+| 依赖 | 版本 | 作用域 |
+|------|------|--------|
+| JUnit Jupiter | 5.10.0 | test |
+
+**Maven插件：**
+
+| 插件 | 版本 |
+|------|------|
+| maven-compiler-plugin | 3.11.0 |
+| exec-maven-plugin | 3.1.0 |
+| maven-jar-plugin | 3.3.0 |
+| maven-surefire-plugin | 3.2.5 |
+
+**Java内置依赖：**
+
+| 包/库 | 来源 | 用途 |
+|-------|------|------|
+| javax.imageio | Java SE 内置 | 图像I/O操作 |
+
+**项目配置属性：**
+
+- Java 版本：17
+- 编码：UTF-8
+
 #### 测试
 
 运行所有测试：
