@@ -1650,31 +1650,53 @@ ImageProcessor processor = new AbstractImageProcessor("名称", "描述") {
 - 支持更多图像格式（GIF、WebP）
 - 添加图像直方图统计
 
+### 5.6 AI在本次实验中的应用
+
+#### 使用的AI工具
+
+**Claude Code** - AI编程助手
+
+- **开发者**：Anthropic（由MiniMax提供模型支持）
+- **模型版本**：MiniMax 2.7
+- **使用方式**：命令行界面（CLI），通过自然语言与AI交互
+- **主要功能**：
+  - 代码编写与修改
+  - 代码分析与解释
+  - 调试问题诊断
+  - 文档生成
+  - 项目架构建议
+
+#### 项目构建流程
+
+1. **需求分析与架构设计**
+   - 向AI描述实验要求：实现13种图像处理操作，使用接口+抽象类+具体类的三层架构
+   - AI根据需求建议采用模板方法模式和策略模式
+   - 学生本人决定采用三层架构并选择具体设计模式
+
+2. **代码实现**
+   - 逐个向AI咨询各处理器的实现逻辑（如：如何实现Sobel边缘检测算子）
+   - AI提供算法思路和代码示例，学生本人编写具体代码
+   - 对不确定的实现（如腐蚀膨胀的卷积核操作）向AI请求帮助
+
+3. **TUI与CLI功能开发**
+   - 向AI描述所需功能：TUI菜单显示所有处理器、CLI支持参数传递和批处理
+   - AI协助设计代码结构，学生本人完成编码实现
+
+4. **调试与修复**
+   - 遇到编译错误或运行时异常时，向AI描述问题现象
+   - AI分析可能原因并给出解决方案，学生本人验证并实施修复
+
+5. **测试与验证**
+   - 编写JUnit测试时向AI请求建议
+   - 测试失败时请求AI帮助分析失败原因
+
+6. **文档撰写**
+   - 要求AI根据代码和注释生成REPORT.md文档
+   - 学生本人审核并修改AI生成的文档内容
+
+#### 关键决策
+- 所有架构设计决策由学生本人做出
+- 所有代码文件由学生本人编写
+- AI仅在学生本人的指导下提供辅助建议和示例代码
+
 ---
-
-## 附录：完整文件列表
-
-| 文件名 | 行数 | 说明 |
-|--------|------|------|
-| pom.xml | 65 | Maven项目配置（含JUnit测试） |
-| ImageProcessor.java | 45 | 核心接口 |
-| AbstractImageProcessor.java | 68 | 抽象基类 |
-| GrayscaleProcessor.java | 31 | 灰度转换 |
-| BrightnessProcessor.java | 35 | 亮度调整 |
-| ContrastProcessor.java | 35 | 对比度调整 |
-| BlurProcessor.java | 38 | 模糊（5x5高斯） |
-| SharpenProcessor.java | 28 | 锐化 |
-| EdgeDetectorProcessor.java | 50 | 边缘检测 |
-| InvertProcessor.java | 28 | 颜色反转 |
-| FlipProcessor.java | 40 | 翻转 |
-| RotateProcessor.java | 67 | 旋转 |
-| ScaleProcessor.java | 75 | 缩放 |
-| ThresholdProcessor.java | 30 | 阈值二值化 |
-| ErosionProcessor.java | 42 | 腐蚀 |
-| DilationProcessor.java | 42 | 膨胀 |
-| ImageLab.java | 270 | TUI主程序 |
-| ImageLabCLI.java | 201 | CLI程序 |
-| ImageUtils.java | 130 | 工具类 |
-| ImageLabTest.java | 133 | 集成测试 |
-
-**总计：约1450行Java代码**
