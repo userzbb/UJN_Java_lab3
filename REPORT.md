@@ -243,28 +243,93 @@ mvn exec:java -Dexec.mainClass="com.imglab.ImageLab"
 ```
 
 #### 运行CLI（单文件）
+
+**语法：**
 ```bash
+mvn exec:java -Dexec.mainClass="com.imglab.ImageLabCLI" -Dexec.args="<输入图像> <输出图像> <操作> [参数1] [参数2] ..."
+```
+
+**示例：**
+```bash
+# 灰度转换（无参数）
 mvn exec:java -Dexec.mainClass="com.imglab.ImageLabCLI" \
      -Dexec.args="input.png output.png grayscale"
+
+# 亮度调整（正数变亮，负数变暗）
+mvn exec:java -Dexec.mainClass="com.imglab.ImageLabCLI" \
+     -Dexec.args="input.png output.png brightness 50"
+mvn exec:java -Dexec.mainClass="com.imglab.ImageLabCLI" \
+     -Dexec.args="input.png output.png brightness -30"
+
+# 对比度调整（>1 增加对比度，<1 减少对比度）
+mvn exec:java -Dexec.mainClass="com.imglab.ImageLabCLI" \
+     -Dexec.args="input.png output.png contrast 1.5"
+
+# 旋转（90的倍数）
+mvn exec:java -Dexec.mainClass="com.imglab.ImageLabCLI" \
+     -Dexec.args="input.png output.png rotate 90"
+mvn exec:java -Dexec.mainClass="com.imglab.ImageLabCLI" \
+     -Dexec.args="input.png output.png rotate 180"
+mvn exec:java -Dexec.mainClass="com.imglab.ImageLabCLI" \
+     -Dexec.args="input.png output.png rotate 270"
+
+# 缩放（>1 放大，<1 缩小）
+mvn exec:java -Dexec.mainClass="com.imglab.ImageLabCLI" \
+     -Dexec.args="input.png output.png scale 2.0"
+mvn exec:java -Dexec.mainClass="com.imglab.ImageLabCLI" \
+     -Dexec.args="input.png output.png scale 0.5"
+
+# 阈值二值化（0-255）
+mvn exec:java -Dexec.mainClass="com.imglab.ImageLabCLI" \
+     -Dexec.args="input.png output.png threshold 128"
 ```
 
 #### 运行CLI（批处理）
+
+**语法：**
 ```bash
+mvn exec:java -Dexec.mainClass="com.imglab.ImageLabCLI" -Dexec.args="--batch <输入目录> <输出目录> <操作列表>"
+```
+
+批处理会依次应用列表中的所有操作到每个图像。
+
+**示例：**
+```bash
+# 基础批处理（灰度 -> 模糊）
 mvn exec:java -Dexec.mainClass="com.imglab.ImageLabCLI" \
-     -Dexec.args="--batch input/ output/ brightness,30 blur"
+     -Dexec.args="--batch ./images/ ./output/ grayscale blur"
+
+# 带参数的批处理（亮度+50 -> 锐化）
+mvn exec:java -Dexec.mainClass="com.imglab.ImageLabCLI" \
+     -Dexec.args="--batch ./images/ ./output/ brightness,50 sharpen"
+
+# 复杂流水线（灰度 -> 缩放2倍 -> 边缘检测）
+mvn exec:java -Dexec.mainClass="com.imglab.ImageLabCLI" \
+     -Dexec.args="--batch ./images/ ./output/ grayscale scale,2.0 edge"
 ```
 
 #### 直接运行JAR
 
-打包后可脱离 Maven 直接运行：
+打包后可脱离 Maven 直接运行，使用方法与 `mvn exec:java` 相同，只需替换命令：
 
+**TUI 模式：**
 ```bash
 java -jar target/img-lab-1.0-SNAPSHOT.jar
+java -jar target/img-lab-1.0-SNAPSHOT.jar /path/to/image.png
 ```
 
-带命令行参数：
+**CLI 单文件模式：**
 ```bash
 java -jar target/img-lab-1.0-SNAPSHOT.jar input.png output.png grayscale
+java -jar target/img-lab-1.0-SNAPSHOT.jar input.png output.png brightness 50
+java -jar target/img-lab-1.0-SNAPSHOT.jar input.png output.png rotate 90
+java -jar target/img-lab-1.0-SNAPSHOT.jar input.png output.png scale 2.0
+```
+
+**CLI 批处理模式：**
+```bash
+java -jar target/img-lab-1.0-SNAPSHOT.jar --batch ./images/ ./output/ grayscale blur
+java -jar target/img-lab-1.0-SNAPSHOT.jar --batch ./images/ ./output/ brightness,50 sharpen
 ```
 
 #### 验证编译
