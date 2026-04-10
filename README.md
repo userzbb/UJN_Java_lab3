@@ -194,27 +194,32 @@ img-lab/
 ├── pom.xml                                    # Maven 配置
 ├── README.md                                  # 本文件
 ├── REPORT.md                                  # 实验报告
-└── src/main/java/com/imglab/
-    ├── ImageLab.java                          # TUI 主入口（菜单选项 1-14）
-    ├── ImageLabCLI.java                       # CLI 入口（支持单文件和批处理）
-    ├── processor/
-    │   ├── ImageProcessor.java               # 接口：图像处理器规范
-    │   ├── AbstractImageProcessor.java       # 抽象基类：模板方法模式
-    │   ├── GrayscaleProcessor.java           # 灰度转换
-    │   ├── BrightnessProcessor.java          # 亮度调整
-    │   ├── ContrastProcessor.java            # 对比度调整
-    │   ├── BlurProcessor.java               # 模糊
-    │   ├── SharpenProcessor.java            # 锐化
-    │   ├── EdgeDetectorProcessor.java       # 边缘检测
-    │   ├── InvertProcessor.java             # 颜色反转
-    │   ├── FlipProcessor.java               # 翻转（水平/垂直）
-    │   ├── RotateProcessor.java             # 旋转
-    │   ├── ScaleProcessor.java              # 缩放
-    │   ├── ThresholdProcessor.java          # 阈值二值化
-    │   ├── ErosionProcessor.java            # 腐蚀
-    │   └── DilationProcessor.java           # 膨胀
-    └── util/
-        └── ImageUtils.java                   # 工具类：图像加载/保存/像素操作/卷积
+├── images/                                    # 输入图像目录
+├── image_output/                              # 输出图像目录
+└── src/
+    ├── main/java/com/imglab/
+    │   ├── ImageLab.java                     # TUI 主入口（菜单选项 1-14）
+    │   ├── ImageLabCLI.java                   # CLI 入口（支持单文件和批处理）
+    │   ├── processor/
+    │   │   ├── ImageProcessor.java            # 接口：图像处理器规范
+    │   │   ├── AbstractImageProcessor.java    # 抽象基类：模板方法模式
+    │   │   ├── GrayscaleProcessor.java        # 灰度转换
+    │   │   ├── BrightnessProcessor.java       # 亮度调整
+    │   │   ├── ContrastProcessor.java         # 对比度调整
+    │   │   ├── BlurProcessor.java             # 模糊
+    │   │   ├── SharpenProcessor.java           # 锐化
+    │   │   ├── EdgeDetectorProcessor.java     # 边缘检测
+    │   │   ├── InvertProcessor.java           # 颜色反转
+    │   │   ├── FlipProcessor.java             # 翻转（水平/垂直）
+    │   │   ├── RotateProcessor.java           # 旋转
+    │   │   ├── ScaleProcessor.java            # 缩放
+    │   │   ├── ThresholdProcessor.java        # 阈值二值化
+    │   │   ├── ErosionProcessor.java          # 腐蚀
+    │   │   └── DilationProcessor.java         # 膨胀
+    │   └── util/
+    │       └── ImageUtils.java                # 工具类：图像加载/保存/像素操作/卷积
+    └── test/java/com/imglab/
+        └── ImageLabTest.java                  # 集成测试：验证所有14种处理器
 ```
 
 ---
@@ -276,7 +281,7 @@ java -jar target/img-lab-1.0-SNAPSHOT.jar --batch ./images/ ./output/ brightness
 
 输入数字选择操作。选择后会提示输入图像路径（如果未在命令行指定）。
 
-处理完成后可选择保存结果或继续其他操作。
+处理完成后默认保存到 `image_output/` 目录（文件名格式：`原名_操作名.扩展名`），也可输入自定义路径。
 
 ---
 
@@ -299,3 +304,25 @@ A: 确保 JDK 版本 >= 17，查看 `pom.xml` 中的 `<release>17</release>`
 
 **Q: 批处理模式找不到文件**
 A: 确保输入目录存在且包含 .png/.jpg/.jpeg/.bmp 文件
+
+---
+
+## 测试
+
+运行单元测试验证所有处理器功能：
+
+```bash
+mvn test
+```
+
+测试会扫描 `images/` 目录中的所有图片，应用全部 14 种图像处理操作，输出到 `image_output/` 目录。
+
+**输出文件命名格式：** `原文件名_处理器名称.扩展名`
+
+例如：`wallhaven-y8wpxl_灰度转换.png`
+
+**测试结构：**
+```
+src/test/java/com/imglab/
+└── ImageLabTest.java    # 集成测试：验证所有14种处理器
+```

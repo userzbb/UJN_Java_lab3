@@ -11,7 +11,7 @@
 | 基础调整 | 灰度转换 | 加权平均法 RGB→灰度 |
 | 基础调整 | 亮度调整 | RGB值线性增减 |
 | 基础调整 | 对比度调整 | 灰度拉伸 |
-| 滤镜效果 | 模糊 | 3x3均值滤波 |
+| 滤镜效果 | 模糊 | 5x5高斯滤波 |
 | 滤镜效果 | 锐化 | 拉普拉斯锐化核 |
 | 滤镜效果 | 颜色反转 | RGB反相 255-原值 |
 | 几何变换 | 水平翻转 | 垂直轴镜像 |
@@ -226,6 +226,16 @@ img-lab/
 #### 环境要求
 - JDK 17+
 - Maven 3.x
+- JUnit 5.10.0（用于单元测试）
+
+#### 测试
+
+运行所有测试：
+```bash
+mvn test
+```
+
+测试文件位于 `src/test/java/com/imglab/ImageLabTest.java`，扫描 `images/` 目录中的所有图片，应用14种图像处理操作，输出到 `image_output/` 目录。
 
 #### 图像路径格式
 
@@ -617,22 +627,24 @@ import java.awt.image.BufferedImage;
 
 /**
  * 模糊处理器
- * 使用3x3均值模糊滤波器
+ * 使用5x5高斯模糊滤波器
  */
 public class BlurProcessor extends AbstractImageProcessor {
 
     public BlurProcessor() {
-        super("模糊", "3x3均值模糊滤波");
+        super("模糊", "5x5高斯模糊滤波");
     }
 
     @Override
     public void process(BufferedImage input, BufferedImage output) {
-        // 3x3均值模糊核
-        // 每个权重为1/9，对9个像素取平均
+        // 5x5高斯模糊核 (sigma≈1.4)
+        // 中心权重最大，边缘递减，符合自然模糊效果
         float[][] kernel = {
-            { 1f/9f, 1f/9f, 1f/9f },
-            { 1f/9f, 1f/9f, 1f/9f },
-            { 1f/9f, 1f/9f, 1f/9f }
+            { 1f/256f,  4f/256f,  6f/256f,  4f/256f,  1f/256f },
+            { 4f/256f, 16f/256f, 24f/256f, 16f/256f,  4f/256f },
+            { 6f/256f, 24f/256f, 36f/256f, 24f/256f,  6f/256f },
+            { 4f/256f, 16f/256f, 24f/256f, 16f/256f,  4f/256f },
+            { 1f/256f,  4f/256f,  6f/256f,  4f/256f,  1f/256f }
         };
 
         int width = input.getWidth();
@@ -640,8 +652,8 @@ public class BlurProcessor extends AbstractImageProcessor {
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                // 使用ImageUtils的applyKernel方法应用卷积
-                int[] result = ImageUtils.applyKernel(input, x, y, kernel, 1f);
+                // 使用ImageUtils的applyKernel方法应用卷积，半径为2
+                int[] result = ImageUtils.applyKernel(input, x, y, kernel, 2);
                 ImageUtils.setPixel(output, x, y, result[0], result[1], result[2]);
             }
         }
@@ -834,6 +846,7 @@ import com.imglab.processor.*;
 import com.imglab.util.ImageUtils;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -953,6 +966,34 @@ public class ImageLab {
                 long endTime = System.currentTimeMillis();
 
                 System.out.println("处理完成! 耗时: " + (endTime - startTime) + "ms");
+
+                // 保存结果
+                System.out.print("保存结果路径 (直接回车保存到 image_output/): ");
+                String savePath = scanner.nextLine().trim();
+                if (savePath.isEmpty()) {
+                    // 默认保存到 image_output/ 目录
+                    File outputDir = new File("image_output");
+                    if (!outputDir.exists()) {
+                        outputDir.mkdirs();
+                    }
+                    // 根据原文件名和操作生成输出文件名
+                    String originalName = currentImagePath != null ?
+                        new File(currentImagePath).getName() : "output.png";
+                    String baseName = originalName.substring(0, originalName.lastIndexOf('.'));
+                    String ext = originalName.substring(originalName.lastIndexOf('.'));
+                    savePath = "image_output/" + baseName + "_" + processor.getName() + ext;
+                }
+                try {
+                    // 确保输出目录存在
+                    File parentDir = new File(savePath).getParentFile();
+                    if (parentDir != null && !parentDir.exists()) {
+                        parentDir.mkdirs();
+                    }
+                    ImageUtils.saveImage(result, savePath);
+                    System.out.println("已保存到: " + savePath);
+                } catch (IOException e) {
+                    System.out.println("保存失败: " + e.getMessage());
+                }
 
                 // 更新当前图像
                 currentImage = result;
@@ -1392,8 +1433,8 @@ A: 旋转90度/270度会交换宽高，缩放操作会按比例改变尺寸
 描述: 将彩色图像转换为灰度图像
   [INFO] 灰度转换 耗时: 156ms
 处理完成! 耗时: 156ms
-保存结果路径 (直接回车跳过): /path/to/output.png
-已保存到: /path/to/output.png
+保存结果路径 (直接回车保存到 image_output/):
+已保存到: image_output/photo_灰度转换.png
 ```
 
 ### 4.2 Lambda表达式演示输出
@@ -1555,7 +1596,7 @@ ImageProcessor processor = new AbstractImageProcessor("名称", "描述") {
 | ThresholdProcessor.java | 30 | 阈值二值化 |
 | ErosionProcessor.java | 42 | 腐蚀 |
 | DilationProcessor.java | 42 | 膨胀 |
-| ImageLab.java | 215 | TUI主程序 |
+| ImageLab.java | 270 | TUI主程序 |
 | ImageLabCLI.java | 163 | CLI程序 |
 | ImageUtils.java | 110 | 工具类 |
 

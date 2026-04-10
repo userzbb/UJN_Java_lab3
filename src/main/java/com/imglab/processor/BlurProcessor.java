@@ -6,21 +6,23 @@ import java.awt.image.BufferedImage;
 
 /**
  * 模糊处理器
- * 使用3x3均值模糊滤波器
+ * 使用5x5高斯模糊滤波器
  */
 public class BlurProcessor extends AbstractImageProcessor {
 
     public BlurProcessor() {
-        super("模糊", "3x3均值模糊滤波");
+        super("模糊", "5x5高斯模糊滤波");
     }
 
     @Override
     public void process(BufferedImage input, BufferedImage output) {
-        // 3x3均值模糊核
+        // 5x5高斯模糊核 (sigma≈1.4)
         float[][] kernel = {
-            { 1f/9f, 1f/9f, 1f/9f },
-            { 1f/9f, 1f/9f, 1f/9f },
-            { 1f/9f, 1f/9f, 1f/9f }
+            { 1f/256f,  4f/256f,  6f/256f,  4f/256f,  1f/256f },
+            { 4f/256f, 16f/256f, 24f/256f, 16f/256f,  4f/256f },
+            { 6f/256f, 24f/256f, 36f/256f, 24f/256f,  6f/256f },
+            { 4f/256f, 16f/256f, 24f/256f, 16f/256f,  4f/256f },
+            { 1f/256f,  4f/256f,  6f/256f,  4f/256f,  1f/256f }
         };
 
         int width = input.getWidth();
@@ -28,7 +30,7 @@ public class BlurProcessor extends AbstractImageProcessor {
 
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                int[] result = ImageUtils.applyKernel(input, x, y, kernel, 1f);
+                int[] result = ImageUtils.applyKernel(input, x, y, kernel, 2);
                 ImageUtils.setPixel(output, x, y, result[0], result[1], result[2]);
             }
         }

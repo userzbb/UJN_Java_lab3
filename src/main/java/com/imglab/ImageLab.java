@@ -4,6 +4,7 @@ import com.imglab.processor.*;
 import com.imglab.util.ImageUtils;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -125,15 +126,31 @@ public class ImageLab {
                 System.out.println("处理完成! 耗时: " + (endTime - startTime) + "ms");
 
                 // 保存结果
-                System.out.print("保存结果路径 (直接回车跳过): ");
+                System.out.print("保存结果路径 (直接回车保存到 image_output/): ");
                 String savePath = scanner.nextLine().trim();
-                if (!savePath.isEmpty()) {
-                    try {
-                        ImageUtils.saveImage(result, savePath);
-                        System.out.println("已保存到: " + savePath);
-                    } catch (IOException e) {
-                        System.out.println("保存失败: " + e.getMessage());
+                if (savePath.isEmpty()) {
+                    // 默认保存到 image_output/ 目录
+                    File outputDir = new File("image_output");
+                    if (!outputDir.exists()) {
+                        outputDir.mkdirs();
                     }
+                    // 根据原文件名和操作生成输出文件名
+                    String originalName = currentImagePath != null ?
+                        new File(currentImagePath).getName() : "output.png";
+                    String baseName = originalName.substring(0, originalName.lastIndexOf('.'));
+                    String ext = originalName.substring(originalName.lastIndexOf('.'));
+                    savePath = "image_output/" + baseName + "_" + processor.getName() + ext;
+                }
+                try {
+                    // 确保输出目录存在
+                    File parentDir = new File(savePath).getParentFile();
+                    if (parentDir != null && !parentDir.exists()) {
+                        parentDir.mkdirs();
+                    }
+                    ImageUtils.saveImage(result, savePath);
+                    System.out.println("已保存到: " + savePath);
+                } catch (IOException e) {
+                    System.out.println("保存失败: " + e.getMessage());
                 }
 
                 // 更新当前图像
