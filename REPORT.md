@@ -196,6 +196,8 @@ processors.values().stream()
 ```
 img-lab/
 ├── pom.xml                                    # Maven配置
+├── images/                                    # 输入图像目录
+├── image_output/                              # 输出图像目录
 ├── src/main/java/com/imglab/
 │   ├── ImageLab.java                          # TUI主入口
 │   ├── ImageLabCLI.java                       # CLI入口
@@ -205,7 +207,7 @@ img-lab/
 │   │   ├── GrayscaleProcessor.java           # 灰度转换
 │   │   ├── BrightnessProcessor.java          # 亮度调整
 │   │   ├── ContrastProcessor.java           # 对比度调整
-│   │   ├── BlurProcessor.java               # 模糊
+│   │   ├── BlurProcessor.java               # 模糊（5x5高斯）
 │   │   ├── SharpenProcessor.java            # 锐化
 │   │   ├── EdgeDetectorProcessor.java       # 边缘检测
 │   │   ├── InvertProcessor.java             # 颜色反转
@@ -218,7 +220,7 @@ img-lab/
 │   └── util/
 │       └── ImageUtils.java                   # 工具类
 └── src/test/java/com/imglab/
-    └── ImageLabTest.java                     # 测试类
+    └── ImageLabTest.java                     # 测试类（14种处理器验证）
 ```
 
 ### 3.2 编译构建
@@ -1580,13 +1582,13 @@ ImageProcessor processor = new AbstractImageProcessor("名称", "描述") {
 
 | 文件名 | 行数 | 说明 |
 |--------|------|------|
-| pom.xml | 43 | Maven项目配置 |
+| pom.xml | 65 | Maven项目配置（含JUnit测试） |
 | ImageProcessor.java | 45 | 核心接口 |
 | AbstractImageProcessor.java | 68 | 抽象基类 |
 | GrayscaleProcessor.java | 31 | 灰度转换 |
 | BrightnessProcessor.java | 35 | 亮度调整 |
 | ContrastProcessor.java | 35 | 对比度调整 |
-| BlurProcessor.java | 28 | 模糊 |
+| BlurProcessor.java | 38 | 模糊（5x5高斯） |
 | SharpenProcessor.java | 28 | 锐化 |
 | EdgeDetectorProcessor.java | 50 | 边缘检测 |
 | InvertProcessor.java | 28 | 颜色反转 |
@@ -1597,7 +1599,8 @@ ImageProcessor processor = new AbstractImageProcessor("名称", "描述") {
 | ErosionProcessor.java | 42 | 腐蚀 |
 | DilationProcessor.java | 42 | 膨胀 |
 | ImageLab.java | 270 | TUI主程序 |
-| ImageLabCLI.java | 163 | CLI程序 |
-| ImageUtils.java | 110 | 工具类 |
+| ImageLabCLI.java | 201 | CLI程序 |
+| ImageUtils.java | 130 | 工具类 |
+| ImageLabTest.java | 133 | 集成测试 |
 
-**总计：约1100行Java代码**
+**总计：约1450行Java代码**
